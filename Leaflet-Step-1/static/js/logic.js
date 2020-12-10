@@ -5,13 +5,18 @@ var myMap = L.map("mapid", {
   });
   
   // Add a tile layer
-  var darkMap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    maxZoom: 18,
-    id: "streets-v11",
+  var darkMap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+    tileSize: 512,
+    maxZoom: 10,
+    zoomOffset: -1,
+    id: "mapbox/dark-v10",
     accessToken: API_KEY
-  }).addTo(myMap);
-
+  });
+  
+  darkMap.addTo(myMap);
+  
+  
   var link = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
 
   // Add a marker to the map for each earthquake
@@ -37,6 +42,14 @@ var myMap = L.map("mapid", {
             return "#e4f0f6";
         }
     }
+
+    function Radius(mag) {
+        if (mag === 0) {
+          return 1;
+        }
+          return mag * 3;
+    }
+    
     function Style(feature) {
         return {
           opacity: 1,
@@ -48,18 +61,16 @@ var myMap = L.map("mapid", {
           weight: 0.5
         }
     }
-    function Radius(mag) {
-        if (mag === 0) {
-          return 1;
+    
+
+    L.geoJson(data, {
+        pointToLayer: function(feature, latlng) {
+          return L.circleMarker(latlng);
+        },
+        style: Style,
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup("Location: " + feature.properties.place + "<hr>Magnitude: " + feature.properties.mag + "<br>Location: " + "<br> Depth: "+ feature.geometry.coordinates[2]);
         }
-          return mag * 3;
-    }
-
     
-    
-     
-
-
-
-
-})
+      }).addTo(myMap);
+  })
