@@ -47,4 +47,4 @@ var myMap = L.map("mapid", {
           weight: 0.5
         };
     }};
-}
+})
