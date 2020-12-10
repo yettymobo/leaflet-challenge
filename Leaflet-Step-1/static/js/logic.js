@@ -73,7 +73,7 @@ function createMap(data) {
 
 
     })
-        //
+        //Add Legend Key
     var legend=L.control({
         position: 'bottomright'
         });
