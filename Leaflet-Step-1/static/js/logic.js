@@ -35,16 +35,30 @@ var myMap = L.map("mapid", {
               return "#0c3953";
           default:
             return "#e4f0f6";
-        };
+        }
+    }
     function Style(feature) {
         return {
           opacity: 1,
           fillOpacity: 1,
           fillColor: Color(feature.geometry.coordinates[2]),
           color: "#000000",
-          radius: mapRadius(feature.properties.mag),
+          radius: Radius(feature.properties.mag),
           stroke: true,
           weight: 0.5
-        };
-    }};
+        }
+    }
+    function Radius(mag) {
+        if (mag === 0) {
+          return 1;
+        }
+          return mag * 3;
+    }
+
+
+
+
+
+
+    
 })
