@@ -15,3 +15,36 @@ var myMap = L.map("mapid", {
   var link = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
 
   // Add a marker to the map for each earthquake
+  d3.json(link).then(function(response) {
+    function Color(depth) {
+        switch (true) {
+          case depth <=50:
+            return "#bcd9ea";
+          case depth <=100:
+            return "#5ba4cf";
+          case depth <=200:
+            return "#298fca";
+          case depth <=300:
+            return "#0079bf";
+          case depth <=400:
+            return "#055a8c";
+          case depth <=500:
+              return "#094c72";
+          case depth >500:
+              return "#0c3953";
+          default:
+            return "#e4f0f6";
+        };
+    function Style(feature) {
+        return {
+          opacity: 1,
+          fillOpacity: 1,
+          fillColor: Color(feature.geometry.coordinates[2]),
+          color: "#000000",
+          radius: mapRadius(feature.properties.mag),
+          stroke: true,
+          weight: 0.5
+        };
+    }
+
+    
