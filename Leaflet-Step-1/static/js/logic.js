@@ -15,7 +15,8 @@ var myMap = L.map("mapid", {
   var link = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
 
   // Add a marker to the map for each earthquake
-  d3.json(link).then(function(response) {
+  d3.json(link).then(function(data) {
+      console.log(data);
     function Color(depth) {
         switch (true) {
           case depth <=50:
@@ -45,6 +46,5 @@ var myMap = L.map("mapid", {
           stroke: true,
           weight: 0.5
         };
-    }
-
-    
+    }};
+}
