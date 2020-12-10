@@ -1,127 +1,97 @@
-// Create a map object
-var myMap = L.map("mapid", {
-    center: [37.09, -95.71],
-    zoom: 5
+// Declare data variable
+var queryURL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson'
+
+d3.json(queryURL, function(data) {
+    console.log(data);
+    
+  createMap(data.features);
+
   });
-  
-  // Add a tile layer
-  var darkMap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
-    tileSize: 512,
-    maxZoom: 10,
-    zoomOffset: -1,
-    id: "mapbox/dark-v10",
-    accessToken: API_KEY
-  });
-  
-  darkMap.addTo(myMap);
-  
-  // Declare data variable
-  var link = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
 
-  // Loop through the features array and create one circle for each location
 
-  d3.json(link, function(data) {
-      console.log(data);
+function createMap(data) {
+   
+    // Create a map object
+    var myMap = L.map("mapid", {
+        center: [15.09, -40.71],
+        zoom: 3
+     });
+  
+    // Add a tile layer
+    L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+        attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+        tileSize: 512,
+        maxZoom: 10,
+        zoomOffset: -1,
+        id: "mapbox/light-v10",
+        accessToken: API_KEY
+    }).addTo(myMap);
 
-      data.forEach(function(feature){
-               
+
+     // iterate through the data for each earthquake instance
+     data.forEach(feature => {
+    
         var depth = feature.geometry.coordinates[2];
         var mag = feature.properties.mag
-        console.log(depth)
-         
-        L.circle([feature.geometry.coordinates[0], feature.geometry.coordinates[1]],{
-            fillOpacity: 0.75,
+        var long = feature.geometry.coordinates[0];
+        var lat  = feature.geometry.coordinates[1];
+
+        
+        // switch statement for color
+        var color = '';
+         if (depth <=50){
+            color = "#bcd9ea";
+         }
+         else if (depth <=100){
+            color = "#5ba4cf";
+         }
+         else if (depth <=200){
+            color = "#298fca";
+         }
+         else if (depth <=300){
+            color = "#0079bf";
+         }
+         else if (depth <=400){
+            color = "#055a8c";
+         }
+         else if (depth <=500){
+            color = "#094c72";
+         }
+        else {
+            color = '#0c3953'
+        }
+
+        // Create circle markers and add pop-up box
+        L.circle([feature.geometry.coordinates[0], feature.geometry.coordinates[1]], {
             color: color,
             fillColor: color,
+            fillOpacity: 0.9,
+            radius: mag*40000
+        }).bindPopup(feature.properties.place + "<hr>Magnitude: " + feature.properties.mag + "<br>Location: " + "<br> Depth: "+ feature.geometry.coordinates[2])
+        .addTo(myMap);
+
+
+
+    })
+        //
+    var legend=L.control({
+        position: 'bottomright'
+        });
+    
+        legend.onAdd=function(){
+            var div=L.DomUtil.create('div', 'legend');
+    
             
-    // Adjust radius
-         radius: mag * 2000
-        }).bindPopup("Location: " + feature.properties.place + "<hr>Magnitude: " + feature.properties.mag + "<br>Location: " + "<br> Depth: "+ feature.geometry.coordinates[2])
-            .addTo(myMap);   
-        
-        
-        var color = "";
-        switch (color) {
-          case depth <=50:
-            return "#bcd9ea";
-          case depth <=100:
-            return "#5ba4cf";
-          case depth <=200:
-            return "#298fca";
-          case depth <=300:
-            return "#0079bf";
-          case depth <=400:
-            return "#055a8c";
-          case depth <=500:
-              return "#094c72";
-          case depth >500:
-              return "#0c3953";
-          default:
-            return "#e4f0f6";
-        }})
-
-
-        
-        
-        
-
-
-        
-        // add circles to map
-        
-
-})
-
-//     function Color(depth) {
-//         switch (true) {
-//           case depth <=50:
-//             return "#bcd9ea";
-//           case depth <=100:
-//             return "#5ba4cf";
-//           case depth <=200:
-//             return "#298fca";
-//           case depth <=300:
-//             return "#0079bf";
-//           case depth <=400:
-//             return "#055a8c";
-//           case depth <=500:
-//               return "#094c72";
-//           case depth >500:
-//               return "#0c3953";
-//           default:
-//             return "#e4f0f6";
-//         }
-//     }
-
-//     function Radius(mag) {
-//         if (mag === 0) {
-//           return 1;
-//         }
-//           return mag * 3;
-//     }
+            var colors = ['#bcd9ea', '#5ba4cf', '#298fca', '#0079bf', '#055a8c', '#094c72', '#0c3953'];
+            var ranges = ['<50', '50-100', '100-200', '200-300', '300-400', '400-500', '500+']
+            // forEach
+            for (var i=0; i <colors.length; i++){
+                div.innerHTML +=
+                '<li style="background-color:'+ colors [i] + '">' + ranges[i] + '</li>'
     
-//     function Style(feature) {
-//         return {
-//           opacity: 1,
-//           fillOpacity: 1,
-//           fillColor: Color(feature.geometry.coordinates[2]),
-//           color: "#000000",
-//           radius: Radius(feature.properties.mag),
-//           stroke: true,
-//           weight: 0.5
-//         }
-//     }
-    
-
-//     L.geoJson(data, {
-//         pointToLayer: function(feature, latlng) {
-//           return L.circleMarker(latlng);
-//         },
-//         style: Style,
-//         onEachFeature: function(feature, layer) {
-//           layer.bindPopup("Location: " + feature.properties.place + "<hr>Magnitude: " + feature.properties.mag + "<br>Location: " + "<br> Depth: "+ feature.geometry.coordinates[2]);
-//         }
-    
-//       }).addTo(myMap);
-//   })
+            }
+        
+            return div;
+        };
+        legend.addTo(myMap)
+    };
